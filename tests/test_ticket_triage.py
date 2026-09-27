@@ -194,7 +194,7 @@ def test_ac13_duplicate_tickets_remain_independent(client):
     assert first_body["ticket"] != duplicate_body["ticket"]
 
 
-def test_ac14_concurrent_requests_do_not_modify_ticket(client):
+def test_ac14_repeated_requests_do_not_modify_ticket(client):
     first = client.get("/tickets/T-001/triage")
     second = client.get("/tickets/T-001/triage")
 
@@ -203,3 +203,24 @@ def test_ac14_concurrent_requests_do_not_modify_ticket(client):
 
     assert first.json()["ticket"] == second.json()["ticket"]
     assert first.json()["ticket"]["id"] == "T-001"
+
+def test_ac15_empty_ticket_returns_422(client, monkeypatch):
+    from app.routes import tickets as tickets_route
+
+    empty_ticket = [
+        {
+            "id": "T-EMPTY",
+            "subject": "",
+            "body": "",
+        }
+    ]
+
+    monkeypatch.setattr(tickets_route, "tickets", lambda: empty_ticket)
+
+    response = client.get("/tickets/T-EMPTY/triage")
+
+    assert response.status_code == 422
+
+    body = response.json()
+    assert "detail" in body
+    assert "code" in body
