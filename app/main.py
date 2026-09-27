@@ -29,7 +29,7 @@ app.include_router(libraries.router)
 app.include_router(tickets.router)
 
 
-_ERROR_CODES = {404: "not_found", 409: "conflict", 503: "model_unavailable", 504: "model_timeout"}
+_ERROR_CODES = {404: "not_found", 409: "conflict", 422: "validation_error", 503: "model_unavailable", 504: "model_timeout"}
 
 
 @app.exception_handler(HTTPException)

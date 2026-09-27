@@ -17,10 +17,18 @@ def triage_ticket(ticket_id: str) -> TicketTriageResponse:
     if ticket_data is None:
         raise HTTPException(status_code=404, detail=f"no ticket with id {ticket_id}")
 
+    subject = str(ticket_data.get("subject") or "").strip()
+    body = str(ticket_data.get("body") or "").strip()
+    if not subject and not body:
+        raise HTTPException(
+            status_code=422,
+            detail=f"ticket {ticket_id} must include a subject or body before triage",
+        )
+
     try:
         result = get_client().complete("classify_ticket", {
-            "subject": ticket_data["subject"],
-            "body": ticket_data["body"],
+            "subject": subject,
+            "body": body,
         })
     except ModelTimeout as exc:
         raise HTTPException(status_code=504, detail=str(exc)) from exc
