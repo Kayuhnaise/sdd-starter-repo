@@ -7,6 +7,8 @@ from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
 Kind = Literal["central", "branch", "bookmobile", "research"]
+TicketCategory = Literal["billing", "access", "data", "outage", "general"]
+TicketPriority = Literal["high", "normal", "low"]
 
 
 class Library(BaseModel):
@@ -59,6 +61,26 @@ class ModelPayload(BaseModel):
 class DescribeResponse(BaseModel):
     library_id: int
     description: str
+    model: ModelPayload
+
+
+class Ticket(BaseModel):
+    id: str
+    subject: str
+    body: str
+
+
+class TicketTriage(BaseModel):
+    category: TicketCategory
+    priority: TicketPriority
+    suggested_team: str
+    draft_first_reply: str
+    requires_human_review: bool
+
+
+class TicketTriageResponse(BaseModel):
+    ticket: Ticket
+    triage: TicketTriage
     model: ModelPayload
 
 
